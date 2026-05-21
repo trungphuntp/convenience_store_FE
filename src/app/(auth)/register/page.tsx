@@ -17,17 +17,15 @@ export default function RegisterPage() {
   const [form] = useFormCustom<RegisterRequest>();
   const router = useRouter();
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
 
   const handleRegister = async (values: RegisterRequest) => {
     setLoading(true);
-    setError('');
     try {
       await authService.register(values);
       toast.success('Đăng ký thành công! Vui lòng đăng nhập.');
       router.push('/login');
-    } catch (err) {
-      setError((err as Error).message || 'Đăng ký thất bại');
+    } catch {
+      // interceptor already toasted the BE error message
     } finally {
       setLoading(false);
     }
@@ -42,12 +40,6 @@ export default function RegisterPage() {
         </Link>
         <p className="text-gray-500 text-sm">Tạo tài khoản mới</p>
       </div>
-
-      {error && (
-        <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg text-red-600 text-sm">
-          {error}
-        </div>
-      )}
 
       <FormCustom<RegisterRequest> form={form} onFinish={handleRegister} layout="vertical" size="large">
         <FormItemCustom

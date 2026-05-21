@@ -29,8 +29,8 @@ export default function CartPage() {
       await orderService.checkout();
       toast.success('Đặt hàng thành công!');
       queryClient.invalidateQueries({ queryKey: ['cart'] });
-    } catch (err) {
-      toast.error((err as Error).message || 'Đặt hàng thất bại');
+    } catch {
+      // interceptor already toasted the BE error message
     } finally {
       setCheckingOut(false);
     }

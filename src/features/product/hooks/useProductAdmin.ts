@@ -22,20 +22,17 @@ export function useProductAdmin() {
   const createMutation = useMutation({
     mutationFn: (data: CreateProductRequest) => productService.create(data),
     onSuccess: () => { invalidate(); toast.success('Tạo sản phẩm thành công'); },
-    onError: (err: Error) => toast.error(err.message),
   });
 
   const updateMutation = useMutation({
     mutationFn: ({ id, data }: { id: number; data: UpdateProductRequest }) =>
       productService.update(id, data),
     onSuccess: () => { invalidate(); toast.success('Cập nhật sản phẩm thành công'); },
-    onError: (err: Error) => toast.error(err.message),
   });
 
   const deleteMutation = useMutation({
     mutationFn: (id: number) => productService.delete(id),
     onSuccess: () => { invalidate(); toast.success('Xóa sản phẩm thành công'); },
-    onError: (err: Error) => toast.error(err.message),
   });
 
   const deleteProduct = (id: number) => {

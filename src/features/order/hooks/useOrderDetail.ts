@@ -25,26 +25,22 @@ export function useOrderDetail(id: number) {
       queryClient.invalidateQueries({ queryKey: ['admin', 'orders'] });
       toast.success('Cập nhật trạng thái thành công');
     },
-    onError: (err: Error) => toast.error(err.message),
   });
 
   const addItemMutation = useMutation({
     mutationFn: (data: OrderItemRequest) => orderService.addOrderItem(id, data),
     onSuccess: () => { invalidate(); toast.success('Thêm sản phẩm thành công'); },
-    onError: (err: Error) => toast.error(err.message),
   });
 
   const updateItemMutation = useMutation({
     mutationFn: ({ itemId, quantity }: { itemId: number; quantity: number }) =>
       orderService.updateOrderItem(id, itemId, { quantity }),
     onSuccess: () => invalidate(),
-    onError: (err: Error) => toast.error(err.message),
   });
 
   const removeItemMutation = useMutation({
     mutationFn: (itemId: number) => orderService.removeOrderItem(id, itemId),
     onSuccess: () => { invalidate(); toast.success('Đã xóa sản phẩm khỏi đơn hàng'); },
-    onError: (err: Error) => toast.error(err.message),
   });
 
   const removeItem = (itemId: number) => {

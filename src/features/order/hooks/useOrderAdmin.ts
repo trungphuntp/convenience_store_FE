@@ -21,7 +21,6 @@ export function useOrderAdmin() {
       queryClient.invalidateQueries({ queryKey: ['admin', 'orders'] });
       toast.success('Cập nhật trạng thái thành công');
     },
-    onError: (err: Error) => toast.error(err.message),
   });
 
   const deleteMutation = useMutation({
@@ -30,7 +29,6 @@ export function useOrderAdmin() {
       queryClient.invalidateQueries({ queryKey: ['admin', 'orders'] });
       toast.success('Xóa đơn hàng thành công');
     },
-    onError: (err: Error) => toast.error(err.message),
   });
 
   const deleteOrder = (id: number) => {

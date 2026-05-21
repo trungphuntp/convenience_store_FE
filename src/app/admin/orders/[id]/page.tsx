@@ -1,9 +1,8 @@
 'use client';
 
-import { useState } from 'react';
 import { use } from 'react';
 import Link from 'next/link';
-import { ArrowLeftOutlined, PlusOutlined, DeleteOutlined } from '@ant-design/icons';
+import { ArrowLeftOutlined, DeleteOutlined } from '@ant-design/icons';
 import type { TableColumnsType } from 'antd';
 import ButtonCustom from '@/components/ui/ButtonCustom';
 import TableCustom from '@/components/ui/TableCustom';
@@ -11,7 +10,6 @@ import SelectCustom from '@/components/ui/SelectCustom';
 import InputNumberCustom from '@/components/ui/InputNumberCustom';
 import SpinCustom from '@/components/ui/SpinCustom';
 import OrderStatusBadge from '@/features/order/components/OrderStatusBadge';
-import AddOrderItemModal from '@/features/order/components/AddOrderItemModal';
 import { useOrderDetail } from '@/features/order/hooks/useOrderDetail';
 import { ORDER_STATUS_CONFIG, NEXT_STATUSES } from '@/features/order/types/order.type';
 import { formatPrice } from '@/utils/formatPrice';
@@ -29,14 +27,10 @@ export default function OrderDetailPage({ params }: PageProps) {
     order,
     isLoading,
     updateStatus,
-    addItem,
     updateItem,
     removeItem,
     isUpdatingStatus,
-    isAddingItem,
   } = useOrderDetail(orderId);
-
-  const [addItemOpen, setAddItemOpen] = useState(false);
 
   if (isLoading) {
     return (
@@ -187,20 +181,9 @@ export default function OrderDetailPage({ params }: PageProps) {
 
       {/* Items table */}
       <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-5">
-        <div className="flex items-center justify-between mb-4">
-          <h2 className="font-semibold text-gray-700">
-            Danh sách sản phẩm ({order.items?.length ?? 0})
-          </h2>
-          <ButtonCustom
-            type="primary"
-            icon={<PlusOutlined />}
-            size="small"
-            onClick={() => setAddItemOpen(true)}
-            className="bg-green-700! border-green-700!"
-          >
-            Thêm sản phẩm
-          </ButtonCustom>
-        </div>
+        <h2 className="font-semibold text-gray-700 mb-4">
+          Danh sách sản phẩm ({order.items?.length ?? 0})
+        </h2>
 
         <TableCustom<OrderItem>
           columns={itemColumns}
@@ -212,12 +195,6 @@ export default function OrderDetailPage({ params }: PageProps) {
         />
       </div>
 
-      <AddOrderItemModal
-        open={addItemOpen}
-        onClose={() => setAddItemOpen(false)}
-        onSubmit={(data) => addItem(data, { onSuccess: () => setAddItemOpen(false) })}
-        loading={isAddingItem}
-      />
     </div>
   );
 }

@@ -28,14 +28,12 @@ export function useCart() {
       queryClient.invalidateQueries({ queryKey: ['cart'] });
       toast.success('Đã thêm vào giỏ hàng');
     },
-    onError: (err: Error) => toast.error(err.message),
   });
 
   const updateMutation = useMutation({
     mutationFn: ({ productId, quantity }: { productId: number; quantity: number }) =>
       cartService.updateItem(productId, { quantity }),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ['cart'] }),
-    onError: (err: Error) => toast.error(err.message),
   });
 
   const removeMutation = useMutation({
@@ -44,7 +42,6 @@ export function useCart() {
       queryClient.invalidateQueries({ queryKey: ['cart'] });
       toast.success('Đã xóa sản phẩm khỏi giỏ hàng');
     },
-    onError: (err: Error) => toast.error(err.message),
   });
 
   const clearMutation = useMutation({
@@ -53,7 +50,6 @@ export function useCart() {
       queryClient.invalidateQueries({ queryKey: ['cart'] });
       toast.success('Đã xóa toàn bộ giỏ hàng');
     },
-    onError: (err: Error) => toast.error(err.message),
   });
 
   const addItem = (req: AddToCartRequest) => {

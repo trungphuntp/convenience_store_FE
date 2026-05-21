@@ -70,7 +70,7 @@ export default function Header() {
             onOpenChange={setCartOpen}
             placement="bottomRight"
             arrow={false}
-            overlayInnerStyle={{ padding: '12px' }}
+            styles={{ body: { padding: '12px' } }}
           >
             <ButtonCustom
               type="default"

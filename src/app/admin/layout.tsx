@@ -1,7 +1,11 @@
-import AdminSidebar from '@/components/admin/AdminSidebar';
-import RequireAuth from '@/components/auth/RequireAuth';
+import AdminSidebar from "@/components/admin/AdminSidebar";
+import RequireAuth from "@/components/auth/RequireAuth";
 
-export default function AdminLayout({ children }: { children: React.ReactNode }) {
+export default function AdminLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   return (
     <RequireAuth adminOnly redirectTo="/login">
       <div className="flex min-h-screen bg-gray-100">

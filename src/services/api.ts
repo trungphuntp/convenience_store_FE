@@ -1,5 +1,6 @@
 import axios from 'axios';
 import type { AxiosError, InternalAxiosRequestConfig } from 'axios';
+import { toast } from 'react-toastify';
 
 let _store: typeof import('@/store').store | null = null;
 async function getStore() {
@@ -12,7 +13,6 @@ async function getStore() {
 
 const MAX_RETRIES = 3;
 
-// Prevent multiple concurrent refresh calls; queue other 403s until done.
 let isRefreshing = false;
 let refreshQueue: Array<{ resolve: () => void; reject: (err: unknown) => void }> = [];
 
@@ -21,7 +21,6 @@ function processQueue(error: unknown) {
   refreshQueue = [];
 }
 
-// Called on login so a fresh session starts with a clean slate.
 export function resetRefreshFailCount() {}
 
 async function forceLogout() {
@@ -55,7 +54,9 @@ api.interceptors.response.use(
   (response) => {
     const body = response.data;
     if (body?.code !== undefined && body.code !== 200) {
-      return Promise.reject(new Error(body.message || 'Có lỗi xảy ra'));
+      const msg: string = body.message || 'Có lỗi xảy ra';
+      toast.error(msg);
+      return Promise.reject(new Error(msg));
     }
     return response;
   },
@@ -63,25 +64,23 @@ api.interceptors.response.use(
     const req = error.config as RetryableConfig | undefined;
     const status = error.response?.status;
     const isRefreshEndpoint = req?.url?.includes('auth/refresh');
+    const serverMessage = (error.response?.data as { message?: string })?.message;
 
-    // ── 4xx: refresh token → retry original request (up to MAX_RETRIES times) ──
+    // ── 4xx: refresh token → retry (up to MAX_RETRIES times) then logout ──
     if (status !== undefined && status >= 400 && status < 500 && req && !isRefreshEndpoint) {
       req._retryCount = (req._retryCount ?? 0) + 1;
 
       if (req._retryCount > MAX_RETRIES) {
+        const msg = serverMessage || 'Phiên đăng nhập đã hết hạn, vui lòng đăng nhập lại';
+        toast.error(msg);
         await forceLogout();
-        return Promise.reject(
-          new Error('Phiên đăng nhập đã hết hạn, vui lòng đăng nhập lại'),
-        );
+        return Promise.reject(new Error(msg));
       }
 
-      // If a refresh is already in flight, wait for it then retry.
+      // If a refresh is already in flight, queue this request and retry after.
       if (isRefreshing) {
         return new Promise((resolve, reject) => {
-          refreshQueue.push({
-            resolve: () => resolve(api(req)),
-            reject,
-          });
+          refreshQueue.push({ resolve: () => resolve(api(req)), reject });
         });
       }
 
@@ -90,29 +89,26 @@ api.interceptors.response.use(
         await api.post('auth/refresh');
         processQueue(null);
         return api(req);
-      } catch (refreshError) {
-        processQueue(refreshError);
-        return Promise.reject(new Error('Không có quyền truy cập'));
+      } catch {
+        processQueue(new Error('session'));
+        const msg = 'Phiên đăng nhập đã hết hạn, vui lòng đăng nhập lại';
+        toast.error(msg);
+        return Promise.reject(new Error(msg));
       } finally {
         isRefreshing = false;
       }
     }
 
-    // ── Generic HTTP error messages ─────────────────────────────────────────
-    if (error.response) {
-      const serverMessage = (error.response.data as { message?: string })?.message;
-      if (serverMessage) return Promise.reject(new Error(serverMessage));
+    // ── All other errors: show backend message then reject ──────────────────
+    const fallback = !error.response
+      ? 'Không thể kết nối đến máy chủ'
+      : status === 500
+        ? 'Lỗi máy chủ, vui lòng thử lại'
+        : 'Có lỗi xảy ra';
 
-      if (status === 400) return Promise.reject(new Error('Yêu cầu không hợp lệ'));
-      if (status === 401) return Promise.reject(new Error('Vui lòng đăng nhập'));
-      if (status === 403) return Promise.reject(new Error('Không có quyền truy cập'));
-      if (status === 404) return Promise.reject(new Error('Không tìm thấy tài nguyên'));
-      if (status === 500) return Promise.reject(new Error('Lỗi máy chủ, vui lòng thử lại'));
-    } else if (error.request) {
-      return Promise.reject(new Error('Không thể kết nối đến máy chủ'));
-    }
-
-    return Promise.reject(error);
+    const msg = serverMessage || fallback;
+    toast.error(msg);
+    return Promise.reject(new Error(msg));
   },
 );
 

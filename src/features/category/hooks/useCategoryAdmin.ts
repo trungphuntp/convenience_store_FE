@@ -14,20 +14,17 @@ export function useCategoryAdmin() {
   const createMutation = useMutation({
     mutationFn: (data: CreateCategoryRequest) => categoryService.create(data),
     onSuccess: () => { invalidate(); toast.success('Tạo danh mục thành công'); },
-    onError: (err: Error) => toast.error(err.message),
   });
 
   const updateMutation = useMutation({
     mutationFn: ({ id, data }: { id: number; data: UpdateCategoryRequest }) =>
       categoryService.update(id, data),
     onSuccess: () => { invalidate(); toast.success('Cập nhật danh mục thành công'); },
-    onError: (err: Error) => toast.error(err.message),
   });
 
   const deleteMutation = useMutation({
     mutationFn: (id: number) => categoryService.delete(id),
     onSuccess: () => { invalidate(); toast.success('Xóa danh mục thành công'); },
-    onError: (err: Error) => toast.error(err.message),
   });
 
   const deleteCategory = (id: number) => {

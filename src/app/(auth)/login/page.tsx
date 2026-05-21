@@ -21,18 +21,16 @@ export default function LoginPage() {
   const dispatch = useDispatch<AppDispatch>();
   const router = useRouter();
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
 
   const handleLogin = async (values: LoginRequest) => {
     setLoading(true);
-    setError('');
     try {
       const res = await authService.login(values);
       dispatch(setUser(res.data));
       toast.success('Đăng nhập thành công!');
       router.push('/');
-    } catch (err) {
-      setError((err as Error).message || 'Đăng nhập thất bại');
+    } catch {
+      // interceptor already toasted the BE error message
     } finally {
       setLoading(false);
     }
@@ -47,12 +45,6 @@ export default function LoginPage() {
         </Link>
         <p className="text-gray-500 text-sm">Đăng nhập để tiếp tục mua sắm</p>
       </div>
-
-      {error && (
-        <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg text-red-600 text-sm">
-          {error}
-        </div>
-      )}
 
       <FormCustom<LoginRequest> form={form} onFinish={handleLogin} layout="vertical" size="large">
         <FormItemCustom
