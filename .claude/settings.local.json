@@ -1,0 +1,11 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm install *)",
+      "Bash(npx tsc *)",
+      "Bash(cat \"C:/Users/tonyc/AppData/Local/Temp/next-panic-8a7013ed47f9c708ab8531fecd9b3c8f.log\" 2>/dev/null | head -80)",
+      "Read(//c/Users/tonyc/AppData/Local/Temp/**)",
+      "Bash(echo \"EXIT:$?\")"
+    ]
+  }
+}
